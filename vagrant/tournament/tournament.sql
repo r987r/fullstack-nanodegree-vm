@@ -7,14 +7,16 @@
 -- these lines here.
 
 
-
+-- connect to tournament
 \c tournament
-DROP VIEW IF EXISTS playerstandings;
-DROP VIEW IF EXISTS playerwins;
-DROP VIEW IF EXISTS playerlosses;
-DROP TABLE IF EXISTS winners;
-DROP TABLE IF EXISTS losers;
-DROP TABLE IF EXISTS players;
+
+-- used for removing warnings/errors when testing.
+-- DROP VIEW IF EXISTS playerstandings;
+-- DROP VIEW IF EXISTS playerwins;
+-- DROP VIEW IF EXISTS playerlosses;
+-- DROP TABLE IF EXISTS winners;
+-- DROP TABLE IF EXISTS losers;
+-- DROP TABLE IF EXISTS players;
 
 CREATE TABLE IF NOT EXISTS players (
 	id serial primary key,
@@ -67,3 +69,6 @@ FROM players
 NATURAL JOIN playerwins
 NATURAL JOIN playerlosses
 ORDER BY wins DESC;
+
+-- Quit
+\q
