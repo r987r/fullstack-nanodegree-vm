@@ -4,7 +4,7 @@
 #
 
 import psycopg2
-
+import bleach
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
@@ -13,15 +13,30 @@ def connect():
 
 def deleteMatches():
     """Remove all the match records from the database."""
-
+    db = connect();
+    c = db.cursor()
+    c.execute("DELETE FROM winners")
+    c.execute("DELETE FROM losers")
+    db.commit()
+    db.close()
 
 def deletePlayers():
     """Remove all the player records from the database."""
-
+    db = connect();
+    c = db.cursor()
+    c.execute("DELETE FROM players")
+    db.commit()
+    db.close()
+    
 
 def countPlayers():
     """Returns the number of players currently registered."""
-
+    db = connect();
+    c = db.cursor()
+    query = "SELECT COUNT(*) as num_players FROM players"
+    c.execute(query)
+    result = c.fetchone()
+    return result[0]
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
@@ -32,6 +47,12 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
+    db = connect();
+    c = db.cursor()
+    content = bleach.clean(name)
+    c.execute("insert into players (name) values (%s)", (name,))
+    db.commit()
+    db.close()
 
 
 def playerStandings():
@@ -47,6 +68,14 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    db = connect() 
+    c = db.cursor()
+    query = "select * from playerStandings"
+    c.execute(query)
+    standings = c.fetchall()
+    players = [(int(plyr[0]), str(plyr[1]), int(plyr[2]), int(plyr[4]))
+        for plyr in standings]
+    return players
 
 
 def reportMatch(winner, loser):
@@ -56,7 +85,12 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
+    db = connect();
+    c = db.cursor()
+    c.execute("insert into winners (winner) values (%s)", (winner,))
+    c.execute("insert into losers (loser) values (%s)", (loser,))
+    db.commit()
+    db.close()
  
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
@@ -74,4 +108,9 @@ def swissPairings():
         name2: the second player's name
     """
 
+    standings = playerStandings()
+    # iterate through standings[x] and standings[x+1] to determine matches.
+    pairings = [ (plyr0[0], plyr0[1], plyr1[0], plyr1[1])
+        for plyr0, plyr1 in zip(standings[::2], standings[1::2])]
+    return pairings
 
