@@ -1,0 +1,36 @@
+Prevent rematches between players.
+
+1) Need to track previous opponents in tournament
+2) make table game to track this: has id, opp0, opp1
+3) make view which has plyr and opp based off above, sort by opp0
+	union these id, opp0, opp1, and id, opp1, opp0
+4) make a dictionary which maps to tuple or list, when assigning matches look at
+this.
+
+Don’t assume an even number of players. If there is an odd number of players, assign one player a “bye” (skipped round). A bye counts as a free win. A player should not receive more than one bye in a tournament.
+
+1) Need to keep track of byes
+2) make a table for this id, plyr
+3) if we see odd # of players assign random one to get bye before doing algo.
+4) add that plyr to bye table.
+
+Support games where a draw (tied game) is possible. This will require changing the arguments to reportMatch.
+
+1) Add a tie table like we have a winner and loser table.
+2) update algorithm to account for ties to to match ups, will need to use a
+score variable
+3) Add a function to calculate score or can add it to the database query also.
+
+When two players have the same number of wins, rank them according to OMW (Opponent Match Wins), the total number of wins by players they have played against.
+
+1) We already have a view which has plyr-> opponents
+2) Add a view based off above which counts opponents wins, so we see plyr-> omw
+3) Add this column to playerStandings view.
+
+Support more than one tournament in the database, so matches do not have to be deleted between tournaments. This will require distinguishing between “a registered player” and “a player who has entered in tournament #123”, so it will require changes to the database schema.
+
+1) Add entry called tournament which tracks id, num, player.
+	num is tourney number
+	id is unique, player is player
+2) Need to split registerPlayer into registerPlayer and addPlayer.
+3) Will need to add a tourney num reference field to each table
